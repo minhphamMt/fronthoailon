@@ -45,13 +45,13 @@ const ChatComponent: React.FC = () => {
     localStorage.setItem("history", JSON.stringify(newHistory));
   };
 
-  const renderMessage = (msg: MessageType) => {
-    const cleanHTML = DOMPurify.sanitize(marked.parse(msg.content), {
-      ADD_TAGS: ["iframe"],
-      ADD_ATTR: ["allow", "allowfullscreen"],
-    });
-    return { __html: cleanHTML };
-  };
+const renderMessage = (msg: MessageType) => {
+  let rawHTML = marked.parse(msg.content);
+  if (rawHTML instanceof Promise) {
+    return rawHTML.then(html => ({ __html: DOMPurify.sanitize(html) }));
+  }
+  return { __html: DOMPurify.sanitize(rawHTML) };
+};
 
   const handleSend = async () => {
     if (!input.trim()) return;
