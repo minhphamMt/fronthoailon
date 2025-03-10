@@ -64,7 +64,7 @@ const renderMessage = (msg: MessageType) => {
     setIsTyping(true);
 
     try {
-      const response = await fetch("https://your-backend-url.com/chat", {
+      const response = await fetch("https://hoailon.railway.internal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input }),
