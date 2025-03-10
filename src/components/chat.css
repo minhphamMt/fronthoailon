@@ -1,0 +1,142 @@
+/* Container */
+@charset "UTF-8";
+.chat-container {
+   font-family: Arial, Helvetica, sans-serif;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  background-color: #0d1117;
+  color: #c9d1d9;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: #161b22;
+  padding: 10px;
+  border-right: 1px solid #30363d;
+  overflow-y: auto;
+  
+}
+.button-lon{
+  position: absolute;
+  top: 92%;
+  left: 49px;
+}
+/* Chatbox Wrapper */
+.chat-box-wrapper {
+  font-size: 18px;
+
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-box {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #eceef0;
+  scrollbar-width: thin;
+  scrollbar-color: #e7e9ec #c6cbd1;
+}
+
+.chat-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+  background-color: #30363d;
+  border-radius: 8px;
+}
+
+/* Message Styling */
+.message {
+  display: block; /* Thay flex thành block */
+  text-align: left; /* Giữ nội dung bên trong căn trái */
+  padding: 10px 16px;
+  border-radius: 20px;
+  max-width: 60%;
+  width: fit-content;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  line-height: 1.4;
+  margin-bottom: 8px; /* Thêm khoảng cách giữa các tin nhắn */
+}
+
+/* Tin nhắn của người dùng (bên phải) */
+.message.user {
+  background-color: #238636;
+  color: #ffffff;
+  margin-left: auto;
+  border-top-right-radius: 0;
+  text-align: left; /* Đảm bảo nội dung vẫn căn trái */
+}
+
+/* Tin nhắn của bot (bên trái) */
+.message.bot {
+  background-color: #30363d;
+  color: #c9d1d9;
+  margin-right: auto;
+  border-top-left-radius: 0;
+  text-align: left; /* Đảm bảo nội dung vẫn căn trái */
+}
+
+/* Chatbox chính */
+.chat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Căn giữa theo chiều ngang */
+  justify-content: flex-start; /* Tin nhắn xếp từ trên xuống */
+  padding: 10px;
+  overflow-y: auto; /* Cuộn nếu nội dung dài */
+  width: 100%;
+}
+
+
+/* Typing Indicator */
+.typing {
+  color: #8b949e;
+  font-size: 14px;
+  padding: 5px;
+}
+
+/* Input Area */
+.input-area {
+  display: flex;
+  padding: 10px;
+  background-color: #aaadb1;
+  border-top: 1px solid #30363d;
+}
+
+textarea {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #e8ebf0;
+ color: black;
+  border: 1px solid #30363d;
+  resize: none;
+  outline: none;
+  height: 50px;
+}
+
+button {
+  margin-left: 10px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  background-color: #238636;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background-color: #2ea043;
+}
