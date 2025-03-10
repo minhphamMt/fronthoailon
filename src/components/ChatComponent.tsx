@@ -69,7 +69,7 @@ const ChatComponent: React.FC = () => {
     setIsTyping(true);
 
     try {
-      const response = await fetch("https://hoailon.railway.internal", {
+      const response = await fetch("https://hoailon-production.up.railway.app", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input }),
@@ -90,7 +90,7 @@ const ChatComponent: React.FC = () => {
 
   const handleNewConversation = async () => {
     try {
-      await fetch("https://hoailon.railway.internal/reset", {
+      await fetch("https://hoailon-production.up.railway.app/reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
