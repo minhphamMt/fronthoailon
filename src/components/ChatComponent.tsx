@@ -11,6 +11,7 @@ interface MessageType {
 
 const ChatComponent: React.FC = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
+  const [parsedMessages, setParsedMessages] = useState<{ __html: string }[]>([]);
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const chatBoxRef = useRef<HTMLDivElement>(null);
@@ -34,6 +35,19 @@ const ChatComponent: React.FC = () => {
     }
   }, [messages]);
 
+  useEffect(() => {
+    const parseMessages = async () => {
+      const parsed = await Promise.all(
+        messages.map(async (msg) => {
+          const rawHTML = await marked.parse(msg.content);
+          return { __html: DOMPurify.sanitize(String(rawHTML)) };
+        })
+      );
+      setParsedMessages(parsed);
+    };
+    parseMessages();
+  }, [messages]);
+
   const saveMessages = (newMessages: MessageType[]) => {
     setMessages(newMessages);
     localStorage.setItem("conversation", JSON.stringify(newMessages));
@@ -42,11 +56,6 @@ const ChatComponent: React.FC = () => {
   const saveHistory = (newHistory: string[]) => {
     setHistory(newHistory);
     localStorage.setItem("history", JSON.stringify(newHistory));
-  };
-
-  const renderMessage = (msg: MessageType) => {
-    const rawHTML = marked.parse(msg.content);
-    return { __html: DOMPurify.sanitize(rawHTML) };
   };
 
   const handleSend = async () => {
@@ -110,8 +119,8 @@ const ChatComponent: React.FC = () => {
 
       <div className="chat-box-wrapper">
         <div className="chat-box" ref={chatBoxRef}>
-          {messages.map((msg, index) => (
-            <div key={index} className={`message ${msg.role}`} dangerouslySetInnerHTML={renderMessage(msg)} />
+          {parsedMessages.map((msg, index) => (
+            <div key={index} className={`message ${messages[index].role}`} dangerouslySetInnerHTML={msg} />
           ))}
           {isTyping && <div className="typing">• • •</div>}
         </div>
