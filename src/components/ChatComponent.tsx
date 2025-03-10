@@ -4,19 +4,23 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./chat.css";
 import DOMPurify from "dompurify";
 
+// Định nghĩa kiểu dữ liệu
+interface MessageType {
+  role: "user" | "bot";
+  content: string;
+}
 
-// Cấu hình marked để hỗ trợ đầy đủ HTML
-
-const ChatComponent = () => {
-  const [messages, setMessages] = useState([]);
+const ChatComponent: React.FC = () => {
+  const [messages, setMessages] = useState<MessageType[]>([]);
   const [input, setInput] = useState("");
-  const [history, setHistory] = useState([]);
-  const chatBoxRef = useRef(null);
+  const [history, setHistory] = useState<string[]>([]);
+  const chatBoxRef = useRef<HTMLDivElement>(null);
   const [isTyping, setIsTyping] = useState(false);
-marked.setOptions({
-  gfm: true,  // Hỗ trợ GitHub Flavored Markdown
-  breaks: true, // Xuống dòng với "\n"
-});
+  
+  marked.setOptions({
+    gfm: true, // Hỗ trợ GitHub Flavored Markdown
+    breaks: true, // Xuống dòng với "\n"
+  });
 
   useEffect(() => {
     const savedMessages = localStorage.getItem("conversation");
@@ -31,23 +35,28 @@ marked.setOptions({
     }
   }, [messages]);
 
-  const saveMessages = (newMessages) => {
+  const saveMessages = (newMessages: MessageType[]) => {
     setMessages(newMessages);
     localStorage.setItem("conversation", JSON.stringify(newMessages));
   };
 
-  const saveHistory = (newHistory) => {
+  const saveHistory = (newHistory: string[]) => {
     setHistory(newHistory);
     localStorage.setItem("history", JSON.stringify(newHistory));
   };
-const renderMessage = (msg) => {
-  const cleanHTML = DOMPurify.sanitize(marked.parse(msg.content), { ADD_TAGS: ["iframe"], ADD_ATTR: ["allow", "allowfullscreen"] });
-  return { __html: cleanHTML };
-};
+
+  const renderMessage = (msg: MessageType) => {
+    const cleanHTML = DOMPurify.sanitize(marked.parse(msg.content), {
+      ADD_TAGS: ["iframe"],
+      ADD_ATTR: ["allow", "allowfullscreen"],
+    });
+    return { __html: cleanHTML };
+  };
+
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const userMessage = { role: "user", content: input };
+    const userMessage: MessageType = { role: "user", content: input };
     const updatedMessages = [...messages, userMessage];
     saveMessages(updatedMessages);
 
@@ -55,7 +64,7 @@ const renderMessage = (msg) => {
     setIsTyping(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/chat", {
+      const response = await fetch("https://your-backend-url.com/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input }),
@@ -64,9 +73,8 @@ const renderMessage = (msg) => {
       const data = await response.json();
       setIsTyping(false);
 
-      const botMessage = { role: "bot", content: data.response || "No response." };
+      const botMessage: MessageType = { role: "bot", content: data.response || "No response." };
 
-      // Hiện chữ từ từ
       let index = 0;
       const interval = setInterval(() => {
         if (index <= botMessage.content.length) {
@@ -84,36 +92,25 @@ const renderMessage = (msg) => {
     } catch (error) {
       console.error("Error:", error);
       setIsTyping(false);
-      const errorMessage = { role: "bot", content: "⚠️ Error receiving response from the bot." };
-      saveMessages([...updatedMessages, errorMessage]);
+      saveMessages([...updatedMessages, { role: "bot", content: "⚠️ Lỗi khi kết nối server." }]);
     }
   };
 
-const handleNewConversation = async () => {
-  try {
-    // Gọi API xóa database
-    await fetch("http://127.0.0.1:5000/reset", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    // Xóa dữ liệu trong state và localStorage
-    saveMessages([]);
-    saveHistory([]);
-    localStorage.removeItem("history");
-
-    console.log("🗑️ Database đã được reset!");
-  } catch (error) {
-    console.error("❌ Lỗi khi reset database:", error);
-  }
-};
-
-  const handleClearHistory = () => {
-    saveHistory([]);
-    localStorage.removeItem("history");
+  const handleNewConversation = async () => {
+    try {
+      await fetch("https://your-backend-url.com/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      saveMessages([]);
+      saveHistory([]);
+      console.log("🗑️ Database đã được reset!");
+    } catch (error) {
+      console.error("❌ Lỗi khi reset database:", error);
+    }
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -121,19 +118,11 @@ const handleNewConversation = async () => {
   };
 
   return (
-    
     <div className="chat-container">
-    
-
-      {/* Sidebar */}
       <div className="sidebar">
         <button onClick={handleNewConversation} className="button-lon btn btn-outline-light">Đoạn chat mới</button>
-      
-    
-        
       </div>
 
-      {/* Chatbox */}
       <div className="chat-box-wrapper">
         <div className="chat-box" ref={chatBoxRef}>
           {messages.map((msg, index) => (
@@ -146,14 +135,13 @@ const handleNewConversation = async () => {
           {isTyping && <div className="typing">• • •</div>}
         </div>
 
-        {/* Input + Options */}
         <div className="input-area">
           <textarea
-           value={input}
-  onChange={(e) => setInput(e.target.value)}
-  onKeyDown={handleKeyDown}
-  placeholder="Nhập câu hỏi của bạn vào đây..."
-  style={{ height: "50px" }} // 👈 Cố định chiều cao input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Nhập câu hỏi của bạn vào đây..."
+            style={{ height: "50px" }}
           />
           <button onClick={handleSend} className="btn btn-success">Gửi</button>
         </div>
