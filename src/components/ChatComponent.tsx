@@ -69,7 +69,7 @@ const ChatComponent: React.FC = () => {
     setIsTyping(true);
 
     try {
-      const response = await fetch("https://hoailon-production.up.railway.app", {
+      const response = await fetch("https://hoailon-production.up.railway.app/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input }),
@@ -88,19 +88,24 @@ const ChatComponent: React.FC = () => {
     }
   };
 
-  const handleNewConversation = async () => {
+const handleNewConversation = async () => {
     try {
-      await fetch("https://hoailon-production.up.railway.app/reset", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-      saveMessages([]);
-      saveHistory([]);
-      console.log("🗑️ Database đã được reset!");
+        await fetch("https://hoailon-production.up.railway.app/reset", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+        });
+        
+        // Xóa toàn bộ tin nhắn trong state và localStorage
+        setMessages([]);
+        setParsedMessages([]);
+        setHistory([]);
+        localStorage.removeItem("conversation");
+        localStorage.removeItem("history");
+        console.log("🗑️ Cuộc trò chuyện đã được reset!");
     } catch (error) {
-      console.error("❌ Lỗi khi reset database:", error);
+        console.error("❌ Lỗi khi reset database:", error);
     }
-  };
+};
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
